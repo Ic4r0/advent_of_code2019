@@ -28,10 +28,10 @@ for noun, verb in noun_verb_pairs:
     supp_int_code[2] = verb
     index = 0
     while supp_int_code[index] != 99 and index < len(supp_int_code):
-        if supp_int_code[index] == 1:
+        if supp_int_code[index] == 1:   # add opcode
             supp_int_code[supp_int_code[index + 3]] = supp_int_code[supp_int_code[index + 1]] + \
                                                       supp_int_code[supp_int_code[index + 2]]
-        elif int_code[index] == 2:
+        elif int_code[index] == 2:      # multiply opcode
             supp_int_code[supp_int_code[index + 3]] = supp_int_code[supp_int_code[index + 1]] * \
                                                       supp_int_code[supp_int_code[index + 2]]
         index += 4

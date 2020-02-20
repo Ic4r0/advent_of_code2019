@@ -19,9 +19,9 @@ int_code[2] = 2
 # Start program
 index = 0
 while int_code[index] != 99 and index < len(int_code):
-    if int_code[index] == 1:
+    if int_code[index] == 1:    # add opcode
         int_code[int_code[index + 3]] = int_code[int_code[index + 1]] + int_code[int_code[index + 2]]
-    elif int_code[index] == 2:
+    elif int_code[index] == 2:  # multiply opcode
         int_code[int_code[index + 3]] = int_code[int_code[index + 1]] * int_code[int_code[index + 2]]
     index += 4
 
