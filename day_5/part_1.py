@@ -11,15 +11,15 @@ def parameter_mode(int_stream: list,
     output_second_par = None
     # First parameter
     if first_par and int(opcode[2]) == 0:
-        output_first_par = int_code[int_code[index + 1]]
+        output_first_par = int_stream[int_stream[idx + 1]]
     else:
-        output_first_par = int_code[index + 1]
+        output_first_par = int_stream[idx + 1]
 
     # Second parameter
     if second_par and int(opcode[1]) == 0:
-        output_second_par = int_code[int_code[index + 2]]
+        output_second_par = int_stream[int_stream[idx + 2]]
     else:
-        output_second_par = int_code[index + 2]
+        output_second_par = int_stream[idx + 2]
 
     return output_first_par, output_second_par
 
