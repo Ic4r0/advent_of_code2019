@@ -105,7 +105,7 @@ for set_a, set_b, set_c, set_d, set_e in phase_settings:
     int_code_c = int_code.copy()
     int_code_d = int_code.copy()
     int_code_e = int_code.copy()
-    
+
     idx_a, c_op_a = (0, 0)
     idx_b, c_op_b = (0, 0)
     idx_c, c_op_c = (0, 0)
@@ -114,21 +114,41 @@ for set_a, set_b, set_c, set_d, set_e in phase_settings:
 
     second_input_a = INPUT_SIGNAL
     single_output = None
-    
+
     while int_code_e[idx_e] != 99 and idx_e < len(int_code_e):
         # Amplifier A
-        second_input_b, idx_a, c_op_a = intcode_computer(int_code_a, first_input=set_a, second_input=second_input_a, index=idx_a, counter=c_op_a)
+        second_input_b, idx_a, c_op_a = intcode_computer(int_code_a, 
+                                                         first_input=set_a, 
+                                                         second_input=second_input_a, 
+                                                         index=idx_a, 
+                                                         counter=c_op_a)
         # Amplifier B
-        second_input_c, idx_b, c_op_b = intcode_computer(int_code_b, first_input=set_b, second_input=second_input_b, index=idx_b, counter=c_op_b)
+        second_input_c, idx_b, c_op_b = intcode_computer(int_code_b, 
+                                                         first_input=set_b, 
+                                                         second_input=second_input_b, 
+                                                         index=idx_b, 
+                                                         counter=c_op_b)
         # Amplifier C
-        second_input_d, idx_c, c_op_c = intcode_computer(int_code_c, first_input=set_c, second_input=second_input_c, index=idx_c, counter=c_op_c)
+        second_input_d, idx_c, c_op_c = intcode_computer(int_code_c, 
+                                                         first_input=set_c, 
+                                                         second_input=second_input_c, 
+                                                         index=idx_c, 
+                                                         counter=c_op_c)
         # Amplifier D
-        second_input_e, idx_d, c_op_d = intcode_computer(int_code_d, first_input=set_d, second_input=second_input_d, index=idx_d, counter=c_op_d)
+        second_input_e, idx_d, c_op_d = intcode_computer(int_code_d, 
+                                                         first_input=set_d, 
+                                                         second_input=second_input_d, 
+                                                         index=idx_d, 
+                                                         counter=c_op_d)
         # Amplifier E
-        second_input_a, idx_e, c_op_e = intcode_computer(int_code_e, first_input=set_e, second_input=second_input_e, index=idx_e, counter=c_op_e)
+        second_input_a, idx_e, c_op_e = intcode_computer(int_code_e, 
+                                                         first_input=set_e, 
+                                                         second_input=second_input_e, 
+                                                         index=idx_e, 
+                                                         counter=c_op_e)
         if second_input_a:
             single_output = second_input_a
-    
+   
     list_of_outputs.append(single_output)
 
 print(max(list_of_outputs))
