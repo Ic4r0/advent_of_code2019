@@ -28,7 +28,7 @@ def find_reachable_stations(asteroid_list:list,
     row, col = couple
     asteroid_list_copy = asteroid_list[:]
     asteroid_list_copy.remove(couple)
-
+    
     # Find all the unreachable asteroids
     to_remove = []
     for elem_row, elem_col in asteroid_list_copy:
