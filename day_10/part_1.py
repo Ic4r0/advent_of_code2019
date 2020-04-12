@@ -42,13 +42,13 @@ def find_reachable_stations(asteroid_list:list,
         if elem_row == row and elem_col < col:
             same_row_left.append(elem)
             asteroid_list_copy.remove(elem)
-        if elem_row == row and elem_col > col:
+        elif elem_row == row and elem_col > col:
             same_row_right.append(elem)
             asteroid_list_copy.remove(elem)
-        if elem_col == col and elem_row < row:
+        elif elem_col == col and elem_row < row:
             same_col_up.append(elem)
             asteroid_list_copy.remove(elem)
-        if elem_col == col and elem_row > row:
+        elif elem_col == col and elem_row > row:
             same_col_down.append(elem)
             asteroid_list_copy.remove(elem)
     while len(same_row_left) > 1:
@@ -70,11 +70,9 @@ def find_reachable_stations(asteroid_list:list,
     supp_row = row - 1
     supp_col = col - 1
     while supp_row > -1 and supp_col > -1:
-        for elem in asteroid_list_copy:
-            if elem == (supp_row, supp_col):
-                same_diagonal_left_up.append(elem)
-                asteroid_list_copy.remove(elem)
-                break
+        if (supp_row, supp_col) in asteroid_list_copy:
+            same_diagonal_left_up.append((supp_row, supp_col))
+            asteroid_list_copy.remove((supp_row, supp_col))
         supp_row -= 1
         supp_col -= 1
     while len(same_diagonal_left_up) > 1:
@@ -85,11 +83,9 @@ def find_reachable_stations(asteroid_list:list,
     supp_row = row + 1
     supp_col = col - 1
     while supp_row < MAX_ROWS and supp_col > -1:
-        for elem in asteroid_list_copy:
-            if elem == (supp_row, supp_col):
-                same_diagonal_left_down.append(elem)
-                asteroid_list_copy.remove(elem)
-                break
+        if (supp_row, supp_col) in asteroid_list_copy:
+            same_diagonal_left_down.append((supp_row, supp_col))
+            asteroid_list_copy.remove((supp_row, supp_col))
         supp_row += 1
         supp_col -= 1
     while len(same_diagonal_left_down) > 1:
@@ -100,11 +96,9 @@ def find_reachable_stations(asteroid_list:list,
     supp_row = row - 1
     supp_col = col + 1
     while supp_row > -1 and supp_col < MAX_COLS:
-        for elem in asteroid_list_copy:
-            if elem == (supp_row, supp_col):
-                same_diagonal_right_up.append(elem)
-                asteroid_list_copy.remove(elem)
-                break
+        if (supp_row, supp_col) in asteroid_list_copy:
+            same_diagonal_right_up.append((supp_row, supp_col))
+            asteroid_list_copy.remove((supp_row, supp_col))
         supp_row -= 1
         supp_col += 1
     while len(same_diagonal_right_up) > 1:
@@ -115,11 +109,9 @@ def find_reachable_stations(asteroid_list:list,
     supp_row = row + 1
     supp_col = col + 1
     while supp_row < MAX_ROWS and supp_col < MAX_COLS:
-        for elem in asteroid_list_copy:
-            if elem == (supp_row, supp_col):
-                same_diagonal_right_down.append(elem)
-                asteroid_list_copy.remove(elem)
-                break
+        if (supp_row, supp_col) in asteroid_list_copy:
+            same_diagonal_right_down.append((supp_row, supp_col))
+            asteroid_list_copy.remove((supp_row, supp_col))
         supp_row += 1
         supp_col += 1
     while len(same_diagonal_right_down) > 1:
@@ -127,8 +119,7 @@ def find_reachable_stations(asteroid_list:list,
     asteroid_list_reachable.extend(same_diagonal_right_down)
 
     # Remove all the other unreachable asteroids
-    for elem in asteroid_list_copy:
-        elem_row, elem_col = elem
+    for elem_row, elem_col in asteroid_list_copy:
         row_dist = row - elem_row
         col_dist = col - elem_col
         next_row = elem_row - row_dist
