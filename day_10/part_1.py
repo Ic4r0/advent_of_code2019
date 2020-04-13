@@ -16,7 +16,7 @@ def find_coords(asteroid_list: list) -> list:
                 # Add the index position in list
                 asteroid_coords.append((row, col))
                 col += 1
-            except ValueError as e:
+            except ValueError:
                 break
         row += 1
     return asteroid_coords
