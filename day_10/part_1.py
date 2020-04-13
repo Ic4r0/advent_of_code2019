@@ -1,6 +1,7 @@
 """--- Day 10: Monitoring Station - Part One ---"""
 
 import os
+import math
 
 # Return all '#' positions
 def find_coords(asteroid_list: list) -> list:
@@ -21,22 +22,22 @@ def find_coords(asteroid_list: list) -> list:
     return asteroid_coords
 
 # Find number of reachable stations
-def find_reachable_stations(asteroid_list:list,
+def find_reachable_stations(asteroid_list: list,
                             couple: list,
                             max_rows: int,
                             max_cols: int) -> list:
     row, col = couple
     asteroid_list_copy = asteroid_list[:]
     asteroid_list_copy.remove(couple)
-    
+
     # Find all the unreachable asteroids
     to_remove = []
     for elem_row, elem_col in asteroid_list_copy:
         row_dist = row - elem_row
         col_dist = col - elem_col
-        while row_dist % 2 == 0 and col_dist % 2 == 0:
-            row_dist /= 2
-            col_dist /= 2
+        row_col_gcd = math.gcd(row_dist, col_dist)
+        row_dist /= row_col_gcd
+        col_dist /= row_col_gcd
         next_row = elem_row - row_dist
         next_col = elem_col - col_dist
         while -1 < next_row < max_rows and -1 < next_col < max_cols:
@@ -51,7 +52,7 @@ def find_reachable_stations(asteroid_list:list,
     return len(asteroid_list_copy)
 
 dirname, _ = os.path.split(os.path.abspath(__file__))
-file_path = dirname + "\\test"
+file_path = dirname + "\\input"
 
 # Open the input file
 with open(file_path) as file:
@@ -63,17 +64,17 @@ with open(file_path) as file:
 MAX_ROWS = len(input_list)
 MAX_COLS = len(input_list[0])
 
-asteroid = find_coords(input_list)
+asteroids = find_coords(input_list)
 
 number_of_reachable_asteroids = []
-for elem in asteroid:
+for elem in asteroids:
     number_of_reachable_asteroids.append(
-        find_reachable_stations(asteroid, elem, MAX_ROWS, MAX_COLS)
+        find_reachable_stations(asteroids, elem, MAX_ROWS, MAX_COLS)
     )
 
 for elem in range(len(number_of_reachable_asteroids)):
-    print(asteroid[elem], ' - ', number_of_reachable_asteroids[elem])
+    print(asteroids[elem], ' - ', number_of_reachable_asteroids[elem])
 
 print('\nThe max value is ', max(number_of_reachable_asteroids), ' for ',
-        asteroid[number_of_reachable_asteroids.index(max(
+        asteroids[number_of_reachable_asteroids.index(max(
             number_of_reachable_asteroids))])
