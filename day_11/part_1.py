@@ -214,7 +214,6 @@ class Hull:
                         [elem for _, elem in self.panels_steps[:-1]]
                         )))
 
-
 dirname, _ = os.path.split(os.path.abspath(__file__))
 file_path = dirname + "\\input"
 
