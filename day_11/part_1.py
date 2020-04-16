@@ -2,249 +2,77 @@
 
 import os
 
-def parameter_mode(int_stream: list,
-                   idx: int,
-                   opcode: str,
-                   rel_base: int,
-                   first_par: bool = True,
-                   second_par: bool = True,
-                   third_par: bool = True):
-    output_first_par = None
-    output_second_par = None
-    output_third_par = None
-
-    # First parameter
-    if first_par and int(opcode[2]) == 0:
-        try:
-            output_first_par = int_stream[int_stream[idx + 1]]
-        except:
-            int_stream.extend([0] * (int_stream[idx + 1] - len(int_stream) + 1))
-            output_first_par = int_stream[int_stream[idx + 1]]
-    elif first_par and int(opcode[2]) == 1:
-        output_first_par = int_stream[idx + 1]
-    elif first_par and int(opcode[2]) == 2:
-        try:
-            output_first_par = int_stream[int_stream[idx + 1] + rel_base]
-        except:
-            int_stream.extend([0] * (int_stream[idx + 1] + rel_base - len(int_stream) + 1))
-            output_first_par = int_stream[int_stream[idx + 1] + rel_base]
-
-    # Second parameter
-    if second_par and int(opcode[1]) == 0:
-        try:
-            output_second_par = int_stream[int_stream[idx + 2]]
-        except:
-            int_stream.extend([0] * (int_stream[idx + 2] - len(int_stream) + 1))
-            output_second_par = int_stream[int_stream[idx + 2]]
-    elif second_par and int(opcode[1]) == 1:
-        output_second_par = int_stream[idx + 2]
-    elif second_par and int(opcode[1]) == 2:
-        try:
-            output_second_par = int_stream[int_stream[idx + 2] + rel_base]
-        except:
-            int_stream.extend([0] * (int_stream[idx + 2] + rel_base - len(int_stream) + 1))
-            output_second_par = int_stream[int_stream[idx + 2] + rel_base]
-
-    # Third parameter
-    if third_par and int(opcode[0]) == 0:
-        output_third_par = int_stream[idx + 3]
-    elif third_par and int(opcode[0]) == 2:
-        output_third_par = int_stream[idx + 3] + rel_base
-
-    return output_first_par, output_second_par, output_third_par
-
-def movement(current_direction: str,
-             previous_positions: list,
-             output_param: int):
-    curr_x, curr_y = previous_positions[-1][1]
-    if current_direction == 'up':
-        if output_param == 0:
-            new_pos = (curr_x-1, curr_y)
-            old_occurences = [elem for elem in previous_positions
-                                if elem[1] == new_pos]
-            if old_occurences:
-                if ['w', new_pos] == old_occurences[-1]:
-                    previous_positions.append(['w', new_pos])
-            else:
-                previous_positions.append(['b', new_pos])
-            new_direction = 'left'
-        else:
-            new_pos = (curr_x+1, curr_y)
-            old_occurences = [elem for elem in previous_positions
-                                if elem[1] == new_pos]
-            if old_occurences:
-                if ['w', new_pos] == old_occurences[-1]:
-                    previous_positions.append(['w', new_pos])
-            else:
-                previous_positions.append(['b', new_pos])
-            new_direction = 'right'
-    elif current_direction == 'down':
-        if output_param == 0:
-            new_pos = (curr_x+1, curr_y)
-            old_occurences = [elem for elem in previous_positions
-                                if elem[1] == new_pos]
-            if old_occurences:
-                if ['w', new_pos] == old_occurences[-1]:
-                    previous_positions.append(['w', new_pos])
-            else:
-                previous_positions.append(['b', new_pos])
-            new_direction = 'right'
-        else:
-            new_pos = (curr_x-1, curr_y)
-            old_occurences = [elem for elem in previous_positions
-                                if elem[1] == new_pos]
-            if old_occurences:
-                if ['w', new_pos] == old_occurences[-1]:
-                    previous_positions.append(['w', new_pos])
-            else:
-                previous_positions.append(['b', new_pos])
-            new_direction = 'left'
-    elif current_direction == 'left':
-        if output_param == 0:
-            new_pos = (curr_x, curr_y-1)
-            old_occurences = [elem for elem in previous_positions
-                                if elem[1] == new_pos]
-            if old_occurences:
-                if ['w', new_pos] == old_occurences[-1]:
-                    previous_positions.append(['w', new_pos])
-            else:
-                previous_positions.append(['b', new_pos])
-            new_direction = 'down'
-        else:
-            new_pos = (curr_x, curr_y+1)
-            old_occurences = [elem for elem in previous_positions
-                                if elem[1] == new_pos]
-            if old_occurences:
-                if ['w', new_pos] == old_occurences[-1]:
-                    previous_positions.append(['w', new_pos])
-            else:
-                previous_positions.append(['b', new_pos])
-            new_direction = 'up'
-    elif current_direction == 'right':
-        if output_param == 0:
-            new_pos = (curr_x, curr_y+1)
-            old_occurences = [elem for elem in previous_positions
-                                if elem[1] == new_pos]
-            if old_occurences:
-                if ['w', new_pos] == old_occurences[-1]:
-                    previous_positions.append(['w', new_pos])
-            else:
-                previous_positions.append(['b', new_pos])
-            new_direction = 'up'
-        else:
-            new_pos = (curr_x, curr_y-1)
-            old_occurences = [elem for elem in previous_positions
-                                if elem[1] == new_pos]
-            if old_occurences:
-                if ['w', new_pos] == old_occurences[-1]:
-                    previous_positions.append(['w', new_pos])
-            else:
-                previous_positions.append(['b', new_pos])
-            new_direction = 'down'
-    return new_direction
-
-def intcode_computer(int_stream: list):
-    panels = [['b', (0, 0)]]
-    direction = 'up'
-    color_set = False
-
-    # Start program
+class IntCode:
     index = 0
     relative_base = 0
-    while int_stream[index] != 99 and index < len(int_stream):
-        opcode = str(int_stream[index]).zfill(5)
-        if int(opcode[-1]) == 1:    # add opcode
-            first_par, second_par, third_par = parameter_mode(int_stream, index, opcode, relative_base)
-            try:
-                int_stream[third_par] = first_par + second_par
-            except:
-                int_stream.extend([0] * (third_par - len(int_stream) + 1))
-                int_stream[third_par] = first_par + second_par
-            index += 4
-        elif int(opcode[-1]) == 2:  # multiply opcode
-            first_par, second_par, third_par = parameter_mode(int_stream, index, opcode, relative_base)
-            try:
-                int_stream[third_par] = first_par * second_par
-            except:
-                int_stream.extend([0] * (third_par - len(int_stream) + 1))
-                int_stream[third_par] = first_par * second_par
-            index += 4
-        elif int(opcode[-1]) == 3:  # input opcode
-            if panels[-1][0] == 'b':
-                input_value = 0
-            else:
-                input_value = 1
-            if int(opcode[2]) == 0:
-                try:
-                    int_stream[int_stream[index + 1]] = input_value
-                except:
-                    int_stream.extend([0] * (int_stream[index + 1] - len(int_stream) + 1))
-                    int_stream[int_stream[index + 1]] = input_value
-            elif int(opcode[2]) == 2:
-                try:
-                    int_stream[int_stream[index + 1] + relative_base] = input_value
-                except:
-                    int_stream.extend([0] * (int_stream[index + 1] + relative_base - len(int_stream) + 1))
-                    int_stream[int_stream[index + 1] + relative_base] = input_value
-            index += 2
-        elif int(opcode[-1]) == 4:  # output opcode
-            first_par, _, _ = parameter_mode(int_stream, index, opcode, relative_base, second_par=False, third_par=False)
-            if not color_set:
-                if first_par == 0:
-                    panels[-1][0] = 'b'
-                else:
-                    panels[-1][0] = 'w'
-                color_set = True
-            else:
-                color_set = False
-                direction = movement(direction, panels, first_par)
+    output_list = []
+    nn_end = False
 
-            index += 2
-        elif int(opcode[-1]) == 5:  # jump-if-true opcode
-            first_par, second_par, _ = parameter_mode(int_stream, index, opcode, relative_base, third_par=False)
-            if first_par != 0:
-                index = second_par
+    def __init__(self,
+                 intcode_list: list,
+                 input_list: list,
+                 instance_id: int = 0):
+        self.intcode_list = intcode_list.copy()
+        self.input_list = input_list.copy()
+        self.instance_id = intcode_id
+
+    def manage_opcode(self):
+        opcode = str(self.intcode_list[self.index]).zfill(5)
+        returned_opcode = opcode[-2:]
+        parameters = []
+        for i in range(3):
+            parameters.append(self.parameter_mode(opcode, i))
+        return returned_opcode, parameters
+
+    def parameter_mode(self,
+                       opcode: str,
+                       parameter_id: int):
+        output_par = None
+        if int(opcode[2-parameter_id]) == 0:
+            output_par = self.intcode_list[self.index + parameter_id + 1]
+        elif int(opcode[2-parameter_id]) == 1:
+            output_par = self.index + parameter_id + 1
+        elif int(opcode[2-parameter_id]) == 2:
+            output_par = self.intcode_list[self.index + parameter_id + 1] +
+                            self.relative_base
+        else:
+            print('Error in parameter_mode')
+        return output_par
+
+    def expand_intcode_list(self, index_out_of_bound: int):
+        self.intcode_list.extend([0] * (index_out_of_bound -
+                                        len(self.intcode_list) + 1))
+
+    def compute_int_code(self):
+        while(True):
+            opcode, parameters = self.manage_opcode()
+            if opcode == '01':      # add opcode
+                pass
+            elif opcode == '02':    # multiply opcode
+                pass
+            elif opcode == '03':    # input opcode
+                pass
+            elif opcode == '04':    # output opcode
+                pass
+            elif opcode == '05':    # jump-if-true opcode
+                pass
+            elif opcode == '06':    # jump-if-false opcode
+                pass
+            elif opcode == '07':    # less than opcode
+                pass
+            elif opcode == '08':    # equal opcode
+                pass
+            elif opcode == '09':    # adjust relative base opcode
+                pass
+            elif opcode == '99':    # ending opcode
+                self.nn_end = True
+                print('IntCode computer execution terminated')
+                break
             else:
-                index += 3
-        elif int(opcode[-1]) == 6:  # jump-if-false opcode
-            first_par, second_par, _ = parameter_mode(int_stream, index, opcode, relative_base, third_par=False)
-            if first_par == 0:
-                index = second_par
-            else:
-                index += 3
-        elif int(opcode[-1]) == 7:  # less than opcode
-            first_par, second_par, third_par = parameter_mode(int_stream, index, opcode, relative_base)
-            if first_par < second_par:
-                try:
-                    int_stream[third_par] = 1
-                except:
-                    int_stream.extend([0] * (third_par - len(int_stream) + 1))
-                    int_stream[third_par] = 1
-            else:
-                try:
-                    int_stream[third_par] = 0
-                except:
-                    int_stream.extend([0] * (third_par - len(int_stream) + 1))
-            index += 4
-        elif int(opcode[-1]) == 8:  # equal opcode
-            first_par, second_par, third_par = parameter_mode(int_stream, index, opcode, relative_base)
-            if first_par == second_par:
-                try:
-                    int_stream[third_par] = 1
-                except:
-                    int_stream.extend([0] * (third_par - len(int_stream) + 1))
-                    int_stream[third_par] = 1
-            else:
-                try:
-                    int_stream[third_par] = 0
-                except:
-                    int_stream.extend([0] * (third_par - len(int_stream) + 1))
-            index += 4
-        elif int(opcode[-1]) == 9:  # adjust relative base opcode
-            first_par, _, _ = parameter_mode(int_stream, index, opcode, relative_base, second_par=False, third_par=False)
-            relative_base += first_par
-            index += 2
-    return panels
+                self.nn_end = True
+                print('Error in compute_int_code')
+                break
+
 
 dirname, _ = os.path.split(os.path.abspath(__file__))
 file_path = dirname + "\\input"
@@ -255,7 +83,3 @@ with open(file_path) as file:
     int_code = []
     for line in file:
         int_code.extend([int(elem) for elem in line.split(',')])
-
-steps_made = intcode_computer(int_stream=int_code)
-visited_panels = list(dict.fromkeys([elem for _, elem in steps_made[:-1]]))
-print(len(visited_panels))
