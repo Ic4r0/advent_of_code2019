@@ -8,20 +8,12 @@ class Reaction:
 
     def __init__(self, reactions: dict):
         self.reactions = deepcopy(reactions)
-        # self.output_elements = self.list_of_op_elements()
-        # print(self.output_elements)
-
-    # def list_of_op_elements(self):
-    #     output_list = []
-    #     for key, _ in self.reactions.items():
-    #         if key[1] not in output_list:
-    #             output_list.append(key[1])
-    #     return output_list
     
     def ore_cost_for_elem(self,
                           qnt_elem: int,
                           elem: str,
                           start_remains: dict = {}):
+        ore_needed = 0
         op_chem, in_chem = [(k, v) for k, v in self.reactions.items()
                                                         if k[1] == elem].pop()
         if op_chem[0] < qnt_elem:
@@ -31,6 +23,24 @@ class Reaction:
                 start_remains[op_chem[1]] = op_chem[0] * multiplier - qnt_elem
         elif op_chem[0] > qnt_elem:
             start_remains[op_chem[1]] = op_chem[0] - qnt_elem
+        
+        if 'ORE' in [v for _, v in in_chem]:
+            ore_needed += sum([qnt for qnt, elem in in_chem if elem == 'ORE'])
+        else:
+            for qnt, elem in in_chem:
+                if elem in start_remains:
+                    if qnt < start_remains[elem]:
+                        start_remains[elem] -= qnt
+                    elif qnt == start_remains[elem]:
+                        start_remains.pop(elem, 0)
+                    else:
+                        ore_needed += self.ore_cost_for_elem(qnt - start_remains.pop(elem, 0), 
+                                                             elem,
+                                                             start_remains)
+                else:
+                    ore_needed += self.ore_cost_for_elem(qnt, elem, start_remains)
+        
+        return ore_needed
 
 dirname, _ = os.path.split(os.path.abspath(__file__))
 file_path = dirname + "\\input"
@@ -50,4 +60,4 @@ with open(file_path) as file:
         reaction_dict[output_chemical] = input_chemical
 
 reaction = Reaction(reaction_dict)
-# reaction.ore_cost_for_elem(1, 'FUEL')
+print(reaction.ore_cost_for_elem(1, 'FUEL'))
